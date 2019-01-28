@@ -122,6 +122,25 @@ ERR:
 		resp.Write(bytes)
 	}
 }
+func handleWorkerList(resp http.ResponseWriter, req *http.Request) {
+	var (
+		workerArr []string
+		err       error
+		bytes     []byte
+	)
+	if workerArr, err = G_workerMgr.ListWOrkers(); err != nil {
+		goto ERR
+	}
+	if bytes, err = common.BuildResponse(0, "success", workerArr); err == nil {
+		resp.Write(bytes)
+	}
+	return
+ERR:
+	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
+		resp.Write(bytes)
+	}
+
+}
 
 // 强制杀死某个任务
 func handleJobKill(resp http.ResponseWriter, req *http.Request) {
@@ -165,6 +184,7 @@ func InitApiServer() (err error) {
 	mux.HandleFunc("/job/list", handleJobList)
 	mux.HandleFunc("/job/kill", handleJobKill)
 	mux.HandleFunc("/job/log", handleJobLog)
+	mux.HandleFunc("/worker/list", handleWorkerList)
 	staticDir = http.Dir(G_config.Webroot)
 	staticHandler = http.FileServer(staticDir)
 	mux.Handle("/", http.StripPrefix("/", staticHandler))

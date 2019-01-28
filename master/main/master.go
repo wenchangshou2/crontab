@@ -28,6 +28,10 @@ func main() {
 	if err = master.InitConfig(configFile); err != nil {
 		goto ERR
 	}
+	//初始化服务发现模块
+	if err = master.InitWorkerMgr(); err != nil {
+		goto ERR
+	}
 	if err = master.InitLogSink(); err != nil {
 		goto ERR
 	}

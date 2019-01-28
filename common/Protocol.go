@@ -42,14 +42,14 @@ type JobExecuteResult struct {
 	EndTime     time.Time //结束 时间
 }
 type JobLog struct {
-	JobName      string `bson:"jobName"`
-	Command      string `bson:"command"`
-	Err          string `bson:"err"`
-	Output       string `bson:"output"`
-	PlanTime     int64  `bson:"planTIme"`     //计划开始时间
-	ScheduleTime int64  `bson:"scheduleTime"` //实际调试调试时间
-	StartTime    int64  `bson:"startTime"`    //任务执行开始时间
-	EndTime      int64  `bson:"endTime"`      //任务执行结束时间
+	JobName      string `json:"jobName" bson:"jobName"`
+	Command      string `json:"command" bson:"command"`
+	Err          string `json:"err" bson:"err"`
+	Output       string `json:"output" bson:"output"`
+	PlanTime     int64  `json:"planTime" bson:"planTime"`         //计划开始时间
+	ScheduleTime int64  `json:"scheduleTime" bson:"scheduleTime"` //实际调试调试时间
+	StartTime    int64  `json:"startTime" bson:"startTime"`       //任务执行开始时间
+	EndTime      int64  `json:"endTime" bson:"endTime"`           //任务执行结束时间
 }
 type LogBatch struct {
 	Logs []interface{} //多条日志
@@ -121,4 +121,9 @@ func BuildJobExecuteInfo(jobSchedulePaln *JobSchedulePlan) (jobExecuteInfo *JobE
 	}
 	jobExecuteInfo.CancelCtx, jobExecuteInfo.CancelFunc = context.WithCancel(context.TODO())
 	return
+}
+
+//提取worker的ip
+func ExtractWorkerIP(regKey string) string {
+	return strings.TrimPrefix(regKey, JOB_WORKER_DIR)
 }
