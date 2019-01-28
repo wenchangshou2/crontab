@@ -1,10 +1,8 @@
 {
-  "apiPort": 8070,
-  "apiReadTimeout": 5000,
-  "apiWriteTimeout": 5000,
   "etcdEndpoints": ["192.168.0.178:2379"],
   "etcdDialTimeout": 5000,
   "mongodbUri": "mongodb://192.168.0.178:27017",
   "mongodbConnectTimeout": 5000,
-  "webroot": "./webroot"
+  "jobLogBatchSize": 100,
+  "jobLogCommitTimeout": 1000
 }

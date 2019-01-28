@@ -28,6 +28,9 @@ func main() {
 	if err = master.InitConfig(configFile); err != nil {
 		goto ERR
 	}
+	if err = master.InitLogSink(); err != nil {
+		goto ERR
+	}
 	if err = master.InitJobMgr(); err != nil {
 		goto ERR
 	}

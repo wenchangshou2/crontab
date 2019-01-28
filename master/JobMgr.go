@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/wenchangshou2/crontab/common"
 	"go.etcd.io/etcd/clientv3"
+	"go.etcd.io/etcd/mvcc/mvccpb"
 	"time"
 )
 
@@ -28,7 +29,7 @@ func InitJobMgr() (err error) {
 		kv     clientv3.KV
 		lease  clientv3.Lease
 	)
-	fmt.Println("config", G_config.EtcdEndpoints)
+	fmt.Println("config", G_config)
 	config = clientv3.Config{
 		Endpoints:   G_config.EtcdEndpoints,
 		DialTimeout: time.Duration(G_config.EtcdDialTimeout) * time.Microsecond,
@@ -88,5 +89,44 @@ func (JobMgr *JobMgr) DeleteJob(name string) (oldJob *common.Job, err error) {
 		}
 		oldJob = &oldJobObj
 	}
+	return
+}
+func (JobMgr *JobMgr) ListJobs() (jobList []*common.Job, err error) {
+	var (
+		dirKey  string
+		getResp *clientv3.GetResponse
+		kvPair  *mvccpb.KeyValue
+		job     *common.Job
+	)
+	dirKey = common.JOB_SAVE_DIR
+	if getResp, err = JobMgr.kv.Get(context.TODO(), dirKey, clientv3.WithPrefix()); err != nil {
+		return
+	}
+	jobList = make([]*common.Job, 0)
+	for _, kvPair = range getResp.Kvs {
+		job = &common.Job{}
+		if err = json.Unmarshal(kvPair.Value, &job); err != nil {
+			err = nil
+			continue
+		}
+		jobList = append(jobList, job)
+	}
+	return
+}
+func (JobMgr *JobMgr) KillJob(name string) (err error) {
+	var (
+		killerKey      string
+		leaseGrantResp *clientv3.LeaseGrantResponse
+		leaseId        clientv3.LeaseID
+	)
+	killerKey = common.JOB_KILLER_DIR + name
+	if leaseGrantResp, err = JobMgr.lease.Grant(context.TODO(), 1); err != nil {
+		return
+	}
+	leaseId = leaseGrantResp.ID
+	if _, err = JobMgr.kv.Put(context.TODO(), killerKey, "", clientv3.WithLease(leaseId)); err != nil {
+		return
+	}
+
 	return
 }

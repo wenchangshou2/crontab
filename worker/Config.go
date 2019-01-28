@@ -1,4 +1,4 @@
-package master
+package worker
 
 import (
 	json "encoding/json"
@@ -10,14 +10,12 @@ var (
 )
 
 type Config struct {
-	ApiPort               int      `json:"apiPort"`
-	ApiReadTimeout        int      `json:"apiReadTimeout"`
-	ApiWriteTimeout       int      `json:"apiWriteTimeout"`
-	MongodbUri            string   `json:"mongodbUri"`
-	MongodbConnectTimeout int      `json:"mongodbConnectTimeout"`
 	EtcdEndpoints         []string `json:"etcdEndpoints"`
 	EtcdDialTimeout       int      `json:"etcdDialTimeout"`
-	Webroot               string   `json:"webroot"`
+	MongodbUri            string   `json:"mongodbUri"`
+	MongodbConnectTimeout int      `json:"mongodbConnectTimeout"`
+	JobLogBatchSize       int      `json:"jobLogBatchSize"`
+	JobLogCommitTimeout   int      `json:"jobLogCommitTimeout""`
 }
 
 //加载配置
